@@ -46,3 +46,6 @@ app/android/.idea/
 !.env.example
 app/ios/App/DeviceDerivedData/
 app/ios/App/**/DerivedData*/
+
+# Nested duplicate clone of this project - not part of the tree
+/lunara/
