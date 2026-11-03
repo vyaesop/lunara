@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "description": "Only /api runs Functions; the app itself is free static assets.",
+  "include": ["/api/*"],
+  "exclude": []
+}

@@ -28,8 +28,18 @@ Lunara is an open-source alternative to Flo®. It is not affiliated with, endors
 
 ## Getting Lunara onto your phone
 
-There is no download. You compile the app on a computer and install it on your
-own phone over a cable. **What you need depends on the phone you have:**
+**Quickest: install the web app.** Open https://lunara-ecm.pages.dev on your
+phone and add it to the home screen (iPhone: Safari › Share › Add to Home
+Screen; Android: Chrome › Install app). The app shows the steps for your
+browser under Settings › Install. It runs full screen and offline, keeps your
+data on the phone, and can send one daily check-in notification with that
+day's reminders (iPhone needs iOS 16.4+ and the home-screen install). It has no
+widget, Apple Health import or biometric unlock; for those, build the native
+app below. Removing the home-screen icon deletes its data, so export a backup
+first.
+
+To build the native app instead, compile it on a computer and install it on
+your own phone over a cable. **What you need depends on the phone you have:**
 
 | Your phone | Your computer | Works? | What you'll use |
 | --- | --- | --- | --- |
@@ -40,10 +50,7 @@ own phone over a cable. **What you need depends on the phone you have:**
 
 **iPhone + Windows is not possible.** Apple only allows iOS apps to be built and
 signed on macOS with Xcode; there is no supported Windows path, and no amount of
-setup works around it. Your options are to borrow a Mac, or run Lunara as a web
-app in your phone's browser (`pnpm dev`, then open the printed network URL on
-your phone) — the browser version keeps your data on the phone but has no
-widgets, notifications, or Health integration.
+setup works around it. Borrow a Mac, or use the web app above.
 
 ### 1. Install the shared prerequisites
 
@@ -121,6 +128,8 @@ shells load a copied bundle, not your live source.
 
 - `app/` — React/Vite product layer plus Capacitor iOS and Android projects
 - `workers/backup/` — stateless zero-knowledge backup relay (Cloudflare Worker + R2)
+- `app/pages/` — Cloudflare Pages config and Functions for the web build (`pnpm --filter @lunara/app deploy:web`)
+- `workers/push/` — daily check-in Web Push for the web build (content-free, cron)
 - `workers/reminders/` — opt-in generic email reminders (no health terms, ever)
 - `docs/NATIVE_ARCHITECTURE.md` — current runtime and platform design
 - `docs/FEATURE_PARITY.md` — honest implementation and release-readiness map

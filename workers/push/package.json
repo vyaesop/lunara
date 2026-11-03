@@ -1,0 +1,10 @@
+{
+  "name": "@lunara/push-worker",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "schema": "wrangler d1 execute lunara-push --remote --file schema.sql"
+  }
+}

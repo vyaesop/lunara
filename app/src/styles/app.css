@@ -8703,3 +8703,101 @@ button.card:active {
     animation: none;
   }
 }
+
+/* Web build: install nudge, install steps, daily check-in. */
+.install-card {
+  margin: 0 0 14px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.install-card strong {
+  font-size: 15px;
+  font-weight: 750;
+}
+
+.install-card p {
+  margin: 3px 0 0;
+}
+
+.install-card-actions {
+  flex: 0 0 auto;
+  display: grid;
+  gap: 6px;
+  justify-items: stretch;
+}
+
+.install-card-primary,
+.web-check-in-install {
+  min-height: 34px;
+  padding: 0 16px;
+  color: #fffaf7;
+  font-size: 13px;
+  font-weight: 750;
+  background: var(--rose-600);
+  border-radius: 999px;
+}
+
+.install-card-dismiss {
+  min-height: 28px;
+  padding: 0 10px;
+  color: var(--ink-500);
+  font-size: 12px;
+  font-weight: 650;
+  background: transparent;
+}
+
+.install-lead {
+  margin: 0;
+  color: var(--ink-900);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.install-steps {
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+  list-style: none;
+  counter-reset: install-step;
+}
+
+.install-steps li {
+  position: relative;
+  padding: 12px 14px 12px 50px;
+  color: var(--ink-900);
+  font-size: 14px;
+  line-height: 1.45;
+  background: var(--paper-100);
+  border: 1px solid var(--line-soft);
+  border-radius: 15px;
+  counter-increment: install-step;
+}
+
+.install-steps li::before {
+  content: counter(install-step);
+  position: absolute;
+  top: 11px;
+  left: 14px;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  color: var(--rose-700);
+  font-size: 12px;
+  font-weight: 800;
+  background: var(--rose-100);
+  border-radius: 50%;
+}
+
+.web-check-in .reminder-quiet-times {
+  grid-template-columns: 1fr;
+}
+
+.web-check-in-install {
+  flex: 0 0 auto;
+}

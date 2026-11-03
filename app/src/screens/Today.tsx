@@ -1,6 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useEffect, useState } from 'react'
 import { DateStrip } from '../components/DateStrip'
+import { InstallCard } from '../components/InstallCard'
 import { LunaraMark } from '../components/LunaraMark'
 import { PREGNANCY_WEEKS } from '../content/pregnancyWeeks'
 import {
@@ -402,6 +403,7 @@ export function Today() {
             today={today}
           />
         </section>
+        <InstallCard />
         {pregnancy ? (
           <section
             key={selectedDate}
@@ -701,6 +703,7 @@ export function Today() {
           today={today}
         />
       </section>
+      <InstallCard />
 
       <section
         key={selectedDate}

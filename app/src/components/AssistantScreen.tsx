@@ -117,7 +117,9 @@ export function AssistantScreen() {
       setVaultLabel(
         status.persistence === 'memory'
           ? 'memory only for this browser tab'
-          : `${status.persistence}${status.hardwareBacked ? ' · hardware protected' : ''}`,
+          : status.persistence === 'browser'
+            ? 'this browser, encrypted with a device key'
+            : `${status.persistence}${status.hardwareBacked ? ' · hardware protected' : ''}`,
       )
       setSetupOpen(!key)
       setLoading(false)
