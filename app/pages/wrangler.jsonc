@@ -1,0 +1,11 @@
+{
+  // Cloudflare Pages project: https://lunara-ecm.pages.dev (web build, installable PWA).
+  // Deploy from app/: pnpm deploy:web (builds, then `wrangler pages deploy` here).
+  "name": "lunara",
+  "pages_build_output_dir": "../dist",
+  "compatibility_date": "2026-10-23",
+  // Daily check-in subscriptions (workers/push/schema.sql), read by the lunara-push cron.
+  "d1_databases": [
+    { "binding": "DB", "database_name": "lunara-push", "database_id": "09e091a3-6047-4460-bc85-989b77158b29" }
+  ]
+}

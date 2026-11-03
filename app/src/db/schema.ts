@@ -651,4 +651,6 @@ export const SK = {
   backupEndpoint: 'backupEndpoint',
   reminderEmail: 'reminderEmail',
   reminderTime: 'reminderTime',
+  /** Web build only: HH:MM of the daily check-in push. */
+  webCheckInTime: 'webCheckInTime',
 } as const

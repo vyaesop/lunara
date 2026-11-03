@@ -70,6 +70,10 @@ import {
 } from '../native/secureVault'
 import { getWidgetStatus, type WidgetStatus } from '../native/widgets'
 import { useApp } from '../state/appStore'
+import { InstallSheet } from '../components/InstallSheet'
+import { WebCheckIn } from '../components/WebCheckIn'
+import { useInstallMode } from '../web/install'
+import { clearReminderDigest, disableCheckIn, shareRemindersWithWorker } from '../web/push'
 
 const DEVICE_TIME_ZONE = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
 
@@ -138,7 +142,7 @@ export function Settings() {
   const [status, setStatus] = useState<string | null>(null)
   const [hasOpenAiKey, setHasOpenAiKey] = useState(false)
   const [hasAnthropicKey, setHasAnthropicKey] = useState(false)
-  const [vaultLabel, setVaultLabel] = useState(isNative ? 'Checking…' : 'Session memory')
+  const [vaultLabel, setVaultLabel] = useState('Checking…')
   const [biometrics, setBiometrics] = useState<BiometricStatus | null>(null)
   const [health, setHealth] = useState<HealthPlatformStatus | null>(null)
   const [widget, setWidget] = useState<WidgetStatus | null>(null)
@@ -147,6 +151,8 @@ export function Settings() {
   const [reminders, setReminders] = useState<ReminderPreferences | null>(null)
   const [pregnancyMethod, setPregnancyMethod] =
     useState<PregnancyDatingMethod>('lmp')
+  const [installOpen, setInstallOpen] = useState(false)
+  const installMode = useInstallMode()
 
   useEffect(() => {
     let alive = true
@@ -165,7 +171,9 @@ export function Settings() {
         setVaultLabel(
           vault.persistence === 'memory'
             ? 'Session memory'
-            : `${vault.persistence}${vault.hardwareBacked ? ' · hardware protected' : ''}`,
+            : vault.persistence === 'browser'
+              ? 'Browser · device key'
+              : `${vault.persistence}${vault.hardwareBacked ? ' · hardware protected' : ''}`,
         )
         setBiometrics(biometricStatus)
         setHealth(healthStatus)
@@ -605,9 +613,8 @@ export function Settings() {
       }
 
       if (!isNative) {
-        setStatus(
-          'Saved locally. Native alarms will be scheduled when these preferences are used in the iOS or Android app.',
-        )
+        await shareRemindersWithWorker(prepared.plans)
+        setStatus('Saved on this device. They arrive in your daily check-in notification.')
       } else if (hasEnabledPlans && permission === 'denied') {
         setStatus('Saved locally, but notifications are blocked in your device settings.')
       } else if (hasEnabledPlans) {
@@ -649,6 +656,8 @@ export function Settings() {
   async function wipe() {
     if (!confirm('Delete ALL Lunara data on this device? This cannot be undone.')) return
     await clearSecureSecrets()
+    await disableCheckIn().catch(() => undefined)
+    await clearReminderDigest()
     await db.delete()
     location.reload()
   }
@@ -841,6 +850,15 @@ export function Settings() {
         </Section>
       )}
 
+      {installMode !== 'native' && installMode !== 'installed' && (
+        <Section title="App">
+          <button className="setting-row" onClick={() => setInstallOpen(true)}>
+            <span>Install Lunara on this device</span>
+            <span className="muted">Home screen ›</span>
+          </button>
+        </Section>
+      )}
+
       <Section title="Your data &amp; encrypted backup">
         <button className="setting-row" onClick={exportPlain}>
           <span>Export a backup file</span>
@@ -883,7 +901,7 @@ export function Settings() {
               <p>
                 {isNative
                   ? 'No account or server is used to deliver these notifications.'
-                  : 'Set your preferences here; the native iOS and Android shells deliver them.'}
+                  : 'They arrive together in one daily check-in. The server never sees them.'}
               </p>
             </div>
             <span
@@ -904,6 +922,7 @@ export function Settings() {
           </div>
 
           <div className="reminder-privacy-controls">
+            {!isNative && <WebCheckIn onInstall={() => setInstallOpen(true)} />}
             <label className="reminder-privacy-row">
               <span>
                 <strong>Private previews</strong>
@@ -1077,6 +1096,7 @@ export function Settings() {
         Lunara is open source (AGPL-3.0) and not affiliated with Flo Health Inc. Not a medical
         device. Removing the app deletes its local history — keep an encrypted backup.
       </p>
+      {installOpen && <InstallSheet onClose={() => setInstallOpen(false)} />}
     </div>
   )
 }

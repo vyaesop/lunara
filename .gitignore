@@ -44,6 +44,7 @@ app/android/.idea/
 .env
 .env.*
 !.env.example
+.secrets/
 app/ios/App/DeviceDerivedData/
 app/ios/App/**/DerivedData*/
 

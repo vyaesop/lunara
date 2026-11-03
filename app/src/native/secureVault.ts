@@ -1,3 +1,10 @@
+import {
+  browserVaultAvailable,
+  browserVaultClear,
+  browserVaultDelete,
+  browserVaultGet,
+  browserVaultSet,
+} from '../web/browserVault'
 import { getLunaraNativeBridge } from './bridge'
 import { isNative, nativePlatform } from './runtime'
 
@@ -18,7 +25,7 @@ interface NativeVaultStatus {
 
 export interface SecureVaultStatus {
   available: boolean
-  persistence: 'keychain' | 'keystore' | 'memory'
+  persistence: 'keychain' | 'keystore' | 'browser' | 'memory'
   hardwareBacked: boolean
   platform: 'ios' | 'android' | 'web'
 }
@@ -29,6 +36,7 @@ export const SECURE_SECRET_KEYS = {
 } as const
 
 const LunaraNative = getLunaraNativeBridge<LunaraNativeVaultPlugin>()
+// Last resort when the browser has no IndexedDB or WebCrypto (some private modes).
 const browserSecrets = new Map<string, string>()
 
 function assertValidKey(key: string): void {
@@ -41,7 +49,7 @@ export async function secureVaultStatus(): Promise<SecureVaultStatus> {
   if (!isNative) {
     return {
       available: true,
-      persistence: 'memory',
+      persistence: browserVaultAvailable() ? 'browser' : 'memory',
       hardwareBacked: false,
       platform: 'web',
     }
@@ -55,7 +63,8 @@ export async function setSecureSecret(key: string, value: string): Promise<void>
   if (typeof value !== 'string') throw new Error('Secret value must be a string.')
 
   if (!isNative) {
-    browserSecrets.set(key, value)
+    if (browserVaultAvailable()) await browserVaultSet(key, value)
+    else browserSecrets.set(key, value)
     return
   }
 
@@ -64,7 +73,9 @@ export async function setSecureSecret(key: string, value: string): Promise<void>
 
 export async function getSecureSecret(key: string): Promise<string | null> {
   assertValidKey(key)
-  if (!isNative) return browserSecrets.get(key) ?? null
+  if (!isNative) {
+    return browserVaultAvailable() ? browserVaultGet(key) : (browserSecrets.get(key) ?? null)
+  }
   return (await LunaraNative.secureGet({ key })).value
 }
 
@@ -72,6 +83,7 @@ export async function deleteSecureSecret(key: string): Promise<void> {
   assertValidKey(key)
   if (!isNative) {
     browserSecrets.delete(key)
+    if (browserVaultAvailable()) await browserVaultDelete(key)
     return
   }
 
@@ -81,6 +93,7 @@ export async function deleteSecureSecret(key: string): Promise<void> {
 export async function clearSecureSecrets(): Promise<void> {
   if (!isNative) {
     browserSecrets.clear()
+    if (browserVaultAvailable()) await browserVaultClear()
     return
   }
 
